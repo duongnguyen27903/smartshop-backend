@@ -60,7 +60,6 @@ export class Profiles {
 export class Accounts {
     @PrimaryGeneratedColumn('increment')
     id: number
-    // @Generated('increment')
     @Column({ unique: true, type: 'varchar' })
     account_number: string
     @Column({ type: 'bigint' })
