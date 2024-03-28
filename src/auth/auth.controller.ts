@@ -4,7 +4,8 @@ import {
   Post,
   Body,
   Query,
-  UseGuards
+  UseGuards,
+  ValidationPipe
 } from '@nestjs/common';
 import LoginDto from './dto/login.dto';
 import SignUpDto from './dto/signup.dto';
@@ -25,7 +26,8 @@ export class AuthController {
 
   @Post('signup')
   @ApiQuery({ name: 'role', enum: UserRole })
-  async signup(@Body() body: SignUpDto, @Query('role') role: UserRole) {
+  //ValidationPipe valide cac du lieu trong body voi cac quy tac trong signupdto
+  async signup(@Body(new ValidationPipe()) body: SignUpDto, @Query('role') role: UserRole) {
     return await this.usersService.signup(body, role);
   }
 
