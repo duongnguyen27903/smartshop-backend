@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { Accounts, Profiles, TransactionHistories, Users } from './entity/user.entity';
 import { UserProfileModule } from './modules/user_profile/user_profile.module';
-import { Categories, Products, SubCategories } from './entity/shop.entity';
+import { CarTypes, Products, Brands } from './entity/shop.entity';
 import { ShopModule } from './modules/shop/shop.module';
 
 
@@ -21,7 +21,7 @@ import { ShopModule } from './modules/shop/shop.module';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [Users, Profiles, Accounts, TransactionHistories, Categories, Products, SubCategories],
+      entities: [Users, Profiles, Accounts, TransactionHistories, CarTypes, Products, Brands],
       keepConnectionAlive: true,
       synchronize: true,
       autoLoadEntities: true,

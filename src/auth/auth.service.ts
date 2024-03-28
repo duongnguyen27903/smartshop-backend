@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import LoginDto from './dto/login.dto';
 import SignUpDto from './dto/signup.dto';
 import { UserRole, Users } from 'src/entity/user.entity';
+import { validate, validateOrReject } from 'class-validator';
 
 @Injectable()
 export class AuthService {
@@ -44,6 +45,7 @@ export class AuthService {
 
     async signup(signupDto: SignUpDto, role: UserRole) {
         const { email, password, username, phone_number } = signupDto;
+
         if (!!(await this.usersRepository.count({ where: { email: email } })))
             throw new ConflictException(
                 'This email address is already used. Try a different email address.',
@@ -58,6 +60,7 @@ export class AuthService {
                 role: role
             });
             return {
+                status: 200,
                 message: 'Create account successfully',
             };
         } catch (error) {
