@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, Generated, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Check, Column, CreateDateColumn, Entity, Generated, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import { Products } from "./shop.entity";
 
 export enum UserRole {
     admin = "admin",
@@ -19,7 +20,7 @@ export class Users {
     email: string
     @Column({ type: 'varchar', length: 30 })
     password: string
-    @Column({ type: 'varchar', length: 20 })
+    @Column({ type: 'varchar', length: 20, unique: true })
     username: string
     @Column({ type: "boolean", default: false })
     isBanned: boolean
@@ -57,12 +58,13 @@ export class Profiles {
 }
 
 @Entity({ name: 'accounts' })
+@Check('LENGTH(TRIM(account_number)) = 12')
 export class Accounts {
     @PrimaryGeneratedColumn('increment')
     id: number
-    @Column({ unique: true, type: 'varchar' })
+    @Column({ unique: true, type: 'varchar', length: 12 })
     account_number: string
-    @Column({ type: 'bigint' })
+    @Column({ type: 'bigint', default: 0 })
     account_balance: number
     @Column({ default: true })
     isActive: boolean
@@ -72,7 +74,7 @@ export class Accounts {
 }
 
 export enum Action {
-    sell = 'sell',
+    deposit = 'deposit',
     buy = 'bought'
 }
 
@@ -82,5 +84,32 @@ export class TransactionHistories {
     id: number
     @Column({ type: 'enum', enum: Action, nullable: false })
     action: Action
+    @CreateDateColumn()
+    timeAt: Date
+}
+
+@Entity({ name: 'carts' })
+@Unique(["userId", "productId"])
+export class Carts {
+    @PrimaryGeneratedColumn('increment')
+    id: number
+    @ManyToOne(() => Users, { cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE', nullable: false })
+    @JoinColumn({ name: 'userId', referencedColumnName: 'id' })
+    userId: string
+
+    @ManyToOne(() => Products, { cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE', nullable: false })
+    @JoinColumn({ name: 'productId', referencedColumnName: 'id' })
+    productId: number
+
+    @Column({ type: 'integer' })
+    amount: number
+
+    // @Column({ type: 'jsonb', nullable: true, default: '[]' })
+    // store: products_in_cart[]
 
 }
+
+// class products_in_cart {
+//     id: number;
+//     amount: number;
+// } []

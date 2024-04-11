@@ -22,6 +22,8 @@ export default class SignUpDto {
 
   @ApiProperty()
   @MaxLength(16)
-
+  @Matches(/[0-9]{3}[0-9]{3}[0-9]{4}/, {
+    message: "Phone number cannot contain text"
+  })
   readonly phone_number: string;
 }

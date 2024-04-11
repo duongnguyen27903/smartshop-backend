@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { MaxLength } from "class-validator";
 import { Gender } from "src/entity/user.entity";
 
@@ -18,3 +18,5 @@ export class CreateProfileDto {
     @ApiProperty({ required: true })
     address: string
 }
+
+export class UpdateProfileDto extends PartialType(CreateProfileDto) { }

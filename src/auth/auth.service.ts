@@ -26,10 +26,11 @@ export class AuthService {
             select: {
                 id: true,
                 email: true,
-                password: true,
                 phone_number: true,
-                username: true
-            }
+                username: true,
+                password: true
+            },
+
         });
 
         if (!user || user.password !== password) {

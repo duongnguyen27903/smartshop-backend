@@ -1,43 +1,51 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Profiles, Users } from 'src/entity/user.entity';
-import { Repository } from 'typeorm';
-import { CreateProfileDto } from './dto/create_profile.dto';
-import { log } from 'console';
+import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { CreateProfileDto, UpdateProfileDto } from './dto/create_profile.dto';
 
 @Injectable()
 export class UserProfileService {
     constructor(
-        @InjectRepository(Profiles) private profile: Repository<Profiles>,
-        @InjectRepository(Users) private user: Repository<Users>
+        @InjectDataSource() private dataSource: DataSource,
+
     ) { }
 
-    async create_profile(body: CreateProfileDto) {
+    async save_profile(body: UpdateProfileDto) {
+        const update_profile_key = Object.keys(body);
+        const update_profile_value = Object.values(body);
+        console.log()
         const { id, first_name, last_name, gender, birthday, address } = body;
-        const user = await this.profile.query('select * from users where id=$1', [id]);
-        if (!user) {
-            return new BadRequestException("Your account is not exist");
+        try {
+            const save = await this.dataSource
+                .query(`insert into profiles(first_name,last_name,birthday,gender,address,"userId") 
+                            values ($1,$2,$3,$4,$5,$6)
+                        on conflict("userId")
+                        do update 
+                            set first_name = excluded.first_name,
+                            last_name = excluded.last_name, 
+                            birthday = excluded.birthday,
+                            gender = excluded.gender,
+                            address = excluded.address
+                            returning *`
+                    , [first_name, last_name, gender, birthday, address, id]);
+            return save;
         }
-        if (user[0].profileId) {
-            try {
-                log("update");
-                const update_profile = await this.profile.query('update profile set first_name=$1,last_name=$2,address=$3,birthday=$4,gender=$5 where id=$6', [first_name, last_name, address, birthday, gender, user[0].profileId]);
-                log(update_profile[0].id);
-            } catch (error) {
-                throw error;
-            }
+        catch (error) {
+            throw new BadRequestException(error);
         }
-        else {
-            try {
-                log("add");
-                const insert_profile = await this.profile.query('insert into profile(first_name,last_name,address,birthday,gender) values($1,$2,$3,$4,$5)', [first_name, last_name, address, birthday, gender]);
-                log(insert_profile);
-                // const update_user = await this.profile.query('update users set "profileId"=$1 where id=$2 '[insert_profile.id, user.id]);
-                // Promise.all([insert_profile, update_user]);
-            } catch (error) {
-                throw error;
-            }
+    }
+
+    async get_profile(id: string) {
+        try {
+            const data = await this.dataSource
+                .query(`select p.first_name,p.last_name,p.birthday,p.gender,p.address 
+                        from users as u 
+                            left join profiles as p 
+                                on u.id= p."userId" 
+                                    where u.id = $1 `, [id]);
+            return data;
+        } catch (error) {
+            throw new BadGatewayException();
         }
-        return user;
     }
 }

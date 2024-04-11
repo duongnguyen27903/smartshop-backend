@@ -14,14 +14,14 @@ export class ShopService {
 
     async GetCategory() {
         try {
+            //query tất cả các types và brands có trong products, 
             const data = await this.dataSource
-                .query(`select main,array_agg(sub) as sub 
-            from 
-                (select car_types.name as main, jsonb_build_object('id',brands.id,'name',brands.name) as sub 
-                    from car_types 
-                        right join brands 
-                            on car_types.id = brands."typeId") temp
-            group by main`);
+                .query(`select main,array_agg(sub) as sub from 
+                            (select car_types.name as main, jsonb_build_object('id',brands.id,'name',brands.name) as sub from car_types 
+                                inner join brands 
+                                    on brands."typeId" = car_types.id 
+                                        where brands.id 
+                                    in ( select distinct("brandId") from products ) ) as temp group by main`);
             return data;
         } catch (error) {
             throw new BadGatewayException(this.ServerError);
@@ -30,6 +30,7 @@ export class ShopService {
 
     async GetProducts(id: number) {
         try {
+            // query tất cả các sản phẩm có trong products có brandId
             const data = await this.dataSource
                 .query(`select id,name,image,price 
                     from products 
@@ -43,12 +44,13 @@ export class ShopService {
 
     async GetDetailProduct(id: number) {
         try {
+            //query chi tiết sản phẩm
             const data = await this.dataSource
-                .query(`select products.id,products.description,products.price,products.name,products.available_quantity,products.image,users.username,users.email,users.phone_number 
-                from products 
-                left join users 
-                    on products."userId" = users.id 
-                        where products.id=$1`, [id])
+                .query(`select products.id,products.description,products.price,products.name,products.available_quantity,products.image,users.username,users.email,users.phone_number,brands.name as brand_name 
+                            from products 
+                            inner join users on products."userId" = users.id
+				            inner join brands on products."brandId"= brands.id
+                                where products.id=$1`, [id])
             return data;
         } catch (error) {
             throw new BadGatewayException(this.ServerError);
