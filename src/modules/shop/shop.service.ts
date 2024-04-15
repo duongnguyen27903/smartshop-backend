@@ -1,15 +1,13 @@
 import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { CreateTransactionDto } from '../account/dto/CreateTransactionDto.dto';
 
 @Injectable()
 export class ShopService {
     constructor(
         @InjectDataSource() private dataSource: DataSource,
-
-    ) {
-
-    }
+    ) { }
     private readonly ServerError = "Server has something wrong, please try again!"
 
     async GetCategory() {
@@ -24,7 +22,7 @@ export class ShopService {
                                     in ( select distinct("brandId") from products ) ) as temp group by main`);
             return data;
         } catch (error) {
-            throw new BadGatewayException(this.ServerError);
+            throw error;
         }
     }
 
@@ -38,7 +36,7 @@ export class ShopService {
                     order by price asc`, [id]);
             return data;
         } catch (error) {
-            throw new BadGatewayException(this.ServerError);
+            throw error;
         }
     }
 
@@ -46,14 +44,14 @@ export class ShopService {
         try {
             //query chi tiết sản phẩm
             const data = await this.dataSource
-                .query(`select products.id,products.description,products.price,products.name,products.available_quantity,products.image,users.username,users.email,users.phone_number,brands.name as brand_name 
+                .query(`select products.id,products.description,products.price,products.name,products.quantity,products.image,users.username,users.email,users.phone_number,brands.name as brand_name 
                             from products 
                             inner join users on products."userId" = users.id
 				            inner join brands on products."brandId"= brands.id
                                 where products.id=$1`, [id])
             return data;
         } catch (error) {
-            throw new BadGatewayException(this.ServerError);
+            throw error;
         }
     }
 }

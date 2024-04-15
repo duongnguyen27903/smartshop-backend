@@ -1,6 +1,7 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, ValidationPipe } from '@nestjs/common';
 import { ShopService } from './shop.service';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateTransactionDto } from '../account/dto/CreateTransactionDto.dto';
 
 @ApiTags('shop')
 @Controller('shop')

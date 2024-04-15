@@ -2,7 +2,7 @@ import { Controller, Get, ParseUUIDPipe, Query, UseGuards, Patch, Body, ParseInt
 import { AccountService } from './account.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { validate, ValidationTypes } from 'class-validator';
+import { CreateTransactionDto } from './dto/CreateTransactionDto.dto';
 
 @ApiTags('account')
 @ApiBearerAuth()
@@ -32,5 +32,12 @@ export class AccountController {
     @Query('amount', ParseIntPipe) amount: number
   ) {
     return await this.accountService.charge(userId, amount);
+  }
+
+  @Post('buy_product')
+  async buy_product(
+    @Body(new ValidationPipe()) body: CreateTransactionDto
+  ) {
+    return await this.accountService.BuyProduct(body);
   }
 }

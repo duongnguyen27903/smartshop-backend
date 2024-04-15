@@ -44,7 +44,7 @@ export class CartService {
     async save_cart(save_cart: SaveCart) {
         const { userId, productId, amount } = save_cart;
         try {
-            const check = await this.dataSource.query(`select available_quantity as quantity from products where id=$1`, [productId]);
+            const check = await this.dataSource.query(`select quantity from products where id=$1`, [productId]);
             if (amount <= 0) {
                 throw new BadRequestException({ message: "Increase your quantity" });
 
