@@ -2,6 +2,7 @@ import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/co
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { CreateProfileDto, UpdateProfileDto } from './dto/create_profile.dto';
+import { UpdateUserDto } from 'src/auth/dto/signup.dto';
 
 @Injectable()
 export class UserProfileService {
@@ -10,11 +11,26 @@ export class UserProfileService {
 
     ) { }
 
+    async update_user(body: UpdateUserDto) {
+        const { password, username, phone_number, id } = body;
+        try {
+            const update = await this.dataSource
+                .query(`
+                update users 
+                set password = $1, username = $2, phone_number = $3 
+                where id = $4 
+                returning email,password,username,phone_number
+            `, [password, username, phone_number, id]).then((val) => {
+                    return val[0];
+                })
+            return update;
+        } catch (error) {
+            throw new error;
+        }
+    }
+
     async save_profile(body: UpdateProfileDto) {
-        const update_profile_key = Object.keys(body);
-        const update_profile_value = Object.values(body);
-        console.log()
-        const { id, first_name, last_name, gender, birthday, address } = body;
+        const { userId, first_name, last_name, gender, birthday, address } = body;
         try {
             const save = await this.dataSource
                 .query(`insert into profiles(first_name,last_name,birthday,gender,address,"userId") 
@@ -27,10 +43,11 @@ export class UserProfileService {
                             gender = excluded.gender,
                             address = excluded.address
                             returning *`
-                    , [first_name, last_name, gender, birthday, address, id]);
+                    , [first_name, last_name, birthday, gender, address, userId]);
             return save;
         }
         catch (error) {
+            console.log(error)
             throw new BadRequestException(error);
         }
     }

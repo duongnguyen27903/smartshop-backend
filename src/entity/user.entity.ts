@@ -116,7 +116,7 @@ export class Accounts {
 }
 
 @Entity({ name: 'transaction_histories' })
-@Check(` (action in ('buy','sell') and "billId" is not null and "from" is not null) or (action = 'deposit' and "billId" is null and "from" is null ) `)
+@Check(` (action in ('buy','sell') and "billId" is not null and "from" is not null) or (action = 'deposit' and "billId" is null and "from" is null and amount > 0 ) `)
 @Check(` "account_number" <> "from" `)
 export class TransactionHistories {
     @PrimaryGeneratedColumn("increment")

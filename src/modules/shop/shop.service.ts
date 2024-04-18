@@ -1,7 +1,6 @@
 import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { CreateTransactionDto } from '../account/dto/CreateTransactionDto.dto';
 
 @Injectable()
 export class ShopService {
@@ -52,6 +51,28 @@ export class ShopService {
             return data;
         } catch (error) {
             throw error;
+        }
+    }
+
+    async GetBestSeller() {
+        try {
+            const best_sellers = await this.dataSource.query(`
+            with bill as (
+                select "productId" as id,sum(amount) as sold
+                from bills 
+                group by "productId" having sum(amount) > 2 order by sold desc
+            ),
+            product as (
+                select p.id, p.name,p.quantity,p.image,p.price,b.id as brandId from products as p left join brands as b on p."brandId" = b.id
+            )
+            select id,p.name,p.image,p.brandId as brandId from bill left join product as p using(id) limit 10`)
+            let start = 0
+            let data = best_sellers.map((val: any) => {
+                return { ...val, identity: start++ }
+            })
+            return data;
+        } catch (error) {
+            throw new error;
         }
     }
 }

@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, Matches, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsUUID, Matches, MaxLength, MinLength } from 'class-validator';
 
 export default class SignUpDto {
   @IsEmail()
@@ -26,4 +26,10 @@ export default class SignUpDto {
     message: "Phone number cannot contain text"
   })
   readonly phone_number: string;
+}
+
+export class UpdateUserDto extends PartialType(SignUpDto) {
+  @ApiProperty()
+  @IsUUID()
+  id: string
 }

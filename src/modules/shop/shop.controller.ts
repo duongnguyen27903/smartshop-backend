@@ -26,4 +26,8 @@ export class ShopController {
   ) {
     return await this.shopService.GetDetailProduct(id);
   }
+  @Get('get_best_seller')
+  async get_best_seller() {
+    return await this.shopService.GetBestSeller();
+  }
 }

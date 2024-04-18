@@ -39,15 +39,41 @@ export class AccountService {
         }
     }
 
-
-
     async charge(userId: string, amount: number) {
+        const check = await this.dataSource.query(`select account_number from accounts where "userId" = $1`, [userId]);
+        if (!check || check.length === 0) {
+            throw new BadRequestException("No account found");
+        }
+        if (amount <= 0) {
+            throw new BadRequestException("The number must > $0")
+        }
+        var data;
         try {
-            const add_money = await this.dataSource
-                .query(`update accounts 
-            set account_balance = account_balance + $1 
-            where "userId" = $2`, [amount, userId])
-            return 1;
+
+            const queryRunner = this.dataSource.createQueryRunner()
+
+            await queryRunner.connect();
+
+            await queryRunner.startTransaction();
+            try {
+                data = queryRunner.query(`update accounts 
+                set account_balance = account_balance + $1 
+                where "userId" = $2 returning account_number,account_balance`, [amount, userId]).then((res) => {
+                    data = res[0];
+                });
+
+                queryRunner.query(`insert into transaction_histories( action, note , amount, account_number )
+                values ('deposit',(select format('Deposit $%s to your account',$1::text)),$1::bigint,$2)
+                `, [amount, check[0].account_number]);
+                await queryRunner.commitTransaction();
+
+                return data;
+            } catch (error) {
+                queryRunner.rollbackTransaction();
+            } finally {
+                await queryRunner.release();
+            }
+
         } catch (error) {
             throw new BadGatewayException();
         }
@@ -88,8 +114,6 @@ export class AccountService {
 
                 // establish real database connection using our new query runner
                 await queryRunner.connect()
-
-
 
                 // lets now open a new transaction:
                 await queryRunner.startTransaction()
@@ -186,6 +210,25 @@ export class AccountService {
 
         } catch (error) {
             throw error;
+        }
+    }
+
+    async GetTransactionHistory(userId: string, page: number) {
+        try {
+
+            const count = await this.dataSource.query(`select count(*) from transaction_histories left join accounts using(account_number) where accounts."userId" = $1`, [userId]);
+            const data = await this.dataSource
+                .query(`with account as (
+            select account_number 
+            from accounts 
+            where "userId" = $1
+        )
+        select id,note,"timeAt",amount,"from","billId" 
+        from transaction_histories 
+        where account_number = (select account_number from account) order by "timeAt" desc limit 20 offset $2`, [userId, 20 * (page - 1)])
+            return { data: data, pages: Math.ceil(count[0].count / 20) };
+        } catch (error) {
+            throw new BadRequestException(error);
         }
     }
 }

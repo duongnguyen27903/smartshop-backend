@@ -1,10 +1,11 @@
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { MaxLength } from "class-validator";
+import { IsUUID, MaxLength } from "class-validator";
 import { Gender } from "src/entity/user.entity";
 
 export class CreateProfileDto {
     @ApiProperty({ required: true })
-    id: string
+    @IsUUID()
+    userId: string
     @MaxLength(20)
     @ApiProperty({ required: true })
     first_name: string

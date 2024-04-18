@@ -40,4 +40,12 @@ export class AccountController {
   ) {
     return await this.accountService.BuyProduct(body);
   }
+
+  @Get('get_transaction_histories')
+  async get_transaction_histories(
+    @Query('userId', ParseUUIDPipe) userId: string,
+    @Query('page', ParseIntPipe) page: number
+  ) {
+    return await this.accountService.GetTransactionHistory(userId, page);
+  }
 }
