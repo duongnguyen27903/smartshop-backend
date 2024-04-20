@@ -1,7 +1,7 @@
 import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { CreateProfileDto, UpdateProfileDto } from './dto/create_profile.dto';
+import { UpdateProfileDto } from './dto/create_profile.dto';
 import { UpdateUserDto } from 'src/auth/dto/signup.dto';
 
 @Injectable()

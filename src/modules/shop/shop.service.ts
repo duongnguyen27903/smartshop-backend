@@ -1,4 +1,4 @@
-import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -7,7 +7,7 @@ export class ShopService {
     constructor(
         @InjectDataSource() private dataSource: DataSource,
     ) { }
-    private readonly ServerError = "Server has something wrong, please try again!"
+    // private readonly ServerError = "Server has something wrong, please try again!"
 
     async GetCategory() {
         try {

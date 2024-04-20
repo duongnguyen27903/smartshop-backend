@@ -10,7 +10,6 @@ import { JwtService } from '@nestjs/jwt';
 import LoginDto from './dto/login.dto';
 import SignUpDto from './dto/signup.dto';
 import { UserRole, Users } from 'src/entity/user.entity';
-import { validate, validateOrReject } from 'class-validator';
 
 @Injectable()
 export class AuthService {
