@@ -18,7 +18,7 @@ import { AccountModule } from './modules/account/account.module';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      port: 5432,
+      port: Number(process.env.DB_PORT),
       host: process.env.DB_HOST,
       username: process.env.DB_USER,
       password: process.env.DB_PASS,

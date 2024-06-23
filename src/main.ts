@@ -27,10 +27,10 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config, {});
-  SwaggerModule.setup('api', app, document, {
+  SwaggerModule.setup('api_list', app, document, {
     jsonDocumentUrl: 'smartshop.json',
   });
 
-  await app.listen(process.env.NODE_ENV === 'production' ? 3124 : 3002);
+  await app.listen(process.env.NODE_ENV === 'production' ? Number(process.env.PORT_PROD) : Number(process.env.PORT_DEV));
 }
 bootstrap();
