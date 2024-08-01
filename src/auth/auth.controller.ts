@@ -15,7 +15,7 @@ import { AuthGuard } from './auth.guard';
 import { UserRole } from 'src/entity/user.entity';
 
 @ApiTags('login')
-@Controller({ path: ['auth'] })
+@Controller({ path: ['api/auth'] })
 export class AuthController {
   constructor(private readonly usersService: AuthService) { }
 

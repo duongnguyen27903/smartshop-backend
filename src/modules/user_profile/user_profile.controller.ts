@@ -8,7 +8,7 @@ import { UpdateUserDto } from 'src/auth/dto/signup.dto';
 @ApiTags("user_profile")
 @ApiBearerAuth()
 @UseGuards(AuthGuard)
-@Controller('user-profile')
+@Controller('api/user-profile')
 export class UserProfileController {
   constructor(private readonly userProfileService: UserProfileService) { }
 

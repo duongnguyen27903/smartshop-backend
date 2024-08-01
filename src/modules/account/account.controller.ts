@@ -7,7 +7,7 @@ import { CreateTransactionDto } from './dto/CreateTransactionDto.dto';
 @ApiTags('account')
 @ApiBearerAuth()
 @UseGuards(AuthGuard)
-@Controller('account')
+@Controller('api/account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) { }
 

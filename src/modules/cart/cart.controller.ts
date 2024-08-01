@@ -7,7 +7,7 @@ import { SaveCart } from './dto/save_cart.dto';
 @ApiTags('cart')
 @ApiBearerAuth()
 @UseGuards(AuthGuard)
-@Controller('cart')
+@Controller('api/cart')
 export class CartController {
   constructor(private readonly cartService: CartService) { }
 
